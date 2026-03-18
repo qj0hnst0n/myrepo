@@ -1,0 +1,93 @@
+---
+title: "Text: Words 2"
+author: "Quinn Johnston"
+editor: visual
+format:
+  html:
+    embed-resources: true
+    code-fold: true  # new
+execute:
+  echo: true
+  message: false
+  warning: false
+---
+
+```{r setup}
+library(tidyverse)
+library(rvest)
+library(wordcloud)
+library(tm)
+library(tidytext)
+library(SnowballC)
+```
+
+# Romeo and Juliet
+
+"Oh Romeo, Romeo, wherefore art thou Romeo?"
+
+Full script - <http://shakespeare.mit.edu/romeo_juliet/full.html>
+
+Let's explore...
+
+1.  Whose name appears more often, Romeo or Juliet?
+2.  Perform "pre-cleaning" on the file to remove extraneous characters.
+3.  Identify which word appears most often in the text
+
+# Read in Romeo and Juliet
+
+### Option 1 - from file
+
+```{r}
+RandJ0 <- read_file("Romeo and Juliet Entire Play.txt")
+str(RandJ0)
+```
+
+### Option 2 - directly
+
+```{r}
+"http://shakespeare.mit.edu/romeo_juliet/full.html" |> 
+  read_html() |> 
+  html_text2() |> 
+  str_sub(1,500)
+```
+
+# Term Frequency
+
+Whose name appears more often, Romeo or Juliet?
+
+```{r}
+# convert the raw Romeo & Juliet text into a data frame
+RandJ_df <- tibble(text = RandJ0)
+
+# tokenize the text into individual words (lowercases & removes punctuation)
+RandJ_words <- RandJ_df |>
+  unnest_tokens(word, text)
+
+# term frequency (before any additional cleaning)
+tf_raw <- RandJ_words |>
+  count(word, sort = TRUE)
+
+# display the 20 most frequent words
+tf_raw |> slice(1:20)
+
+# compare how often the names "romeo" & "juliet" appear
+tf_raw |> filter(word %in% c("romeo", "juliet"))
+```
+
+# Pre-cleaning / Tokenize
+
+Perform "pre-cleaning" on the file to remove extraneous characters.
+
+```{r}
+# remove empty tokens & any tokens containing digits
+RandJ_clean <- RandJ_words |>
+  filter(word != "") |>
+  filter(!str_detect(word, "[0-9]"))
+
+# compute term frequencies
+tf_clean <- RandJ_clean |>
+  count(word, sort = TRUE)
+
+# identify the most frequently occurring word in the text
+tf_clean |> slice(1)
+```

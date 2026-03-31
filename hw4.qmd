@@ -68,10 +68,11 @@ tf_raw <- RandJ_words |>
   count(word, sort = TRUE)
 
 # display the 20 most frequent words
-tf_raw |> slice(1:20)
+tf_raw |> slice(1:20) # probably don't need to loook at most frequent words here
 
 # compare how often the names "romeo" & "juliet" appear
 tf_raw |> filter(word %in% c("romeo", "juliet"))
+# I like the clear and concise steps you took to get here but a more simple approach could be just `RandJ0 |> str_to_lower |> str_count("romeo")` and then do the same for juliet
 ```
 
 # Pre-cleaning / Tokenize
@@ -82,7 +83,7 @@ Perform "pre-cleaning" on the file to remove extraneous characters.
 # remove empty tokens & any tokens containing digits
 RandJ_clean <- RandJ_words |>
   filter(word != "") |>
-  filter(!str_detect(word, "[0-9]"))
+  filter(!str_detect(word, "[0-9]")) # I like the idea of getting rid of line numbers
 
 # compute term frequencies
 tf_clean <- RandJ_clean |>
